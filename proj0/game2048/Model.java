@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author DONE: YU-PUNG
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -168,6 +168,32 @@ public class Model extends Observable {
         return false;
     }
 
+    public static boolean checkPos(Board b, int col, int row, int maxCol, int maxRow) {
+        int current = b.tile(col, row).value();
+        if (row - 1 >= 0) {
+            Tile left = b.tile(col, row - 1);
+            if (left != null && left.value() == current) {
+                return true;
+            }
+        }
+        if (row + 1 < maxRow) {
+            Tile right = b.tile(col, row + 1);
+            if (right != null && right.value() == current) {
+                return true;
+            }
+        }
+        if (col + 1 < maxCol) {
+            Tile top = b.tile(col + 1, row);
+            if (top != null && top.value() == current) {
+                return true;
+            }
+        }
+        if (col - 1 >= 0) {
+            Tile bottom = b.tile(col - 1, row);
+            return bottom != null && bottom.value() == current;
+        }
+        return false;
+    }
     /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
@@ -175,7 +201,21 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        // DONE: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        int maxRow = b.size(), maxCol = b.size();
+        for (int row = 0; row < maxRow; row += 1) {
+            for (int col = 0; col < maxCol; col += 1) {
+                if (b.tile(col, row) == null) {
+                    continue;
+                };
+                if (checkPos(b, col, row, maxCol, maxRow)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
