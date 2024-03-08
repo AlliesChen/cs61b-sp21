@@ -167,30 +167,33 @@ public class Model extends Observable {
         }
         return false;
     }
-
-    public static boolean checkPos(Board b, int col, int row, int maxCol, int maxRow) {
-        int current = b.tile(col, row).value();
+    // Collect valid surrounded tiles
+    public static Tile[] validPos(Board b, int col, int row, int maxCol, int maxRow) {
+        Tile[] result = new Tile[4];
         if (row - 1 >= 0) {
             Tile left = b.tile(col, row - 1);
-            if (left != null && left.value() == current) {
-                return true;
-            }
+            result[0] = left;
         }
         if (row + 1 < maxRow) {
             Tile right = b.tile(col, row + 1);
-            if (right != null && right.value() == current) {
-                return true;
-            }
+            result[1] = right;
         }
         if (col + 1 < maxCol) {
             Tile top = b.tile(col + 1, row);
-            if (top != null && top.value() == current) {
-                return true;
-            }
+            result[2] = top;
         }
         if (col - 1 >= 0) {
             Tile bottom = b.tile(col - 1, row);
-            return bottom != null && bottom.value() == current;
+            result[3] = bottom;
+        }
+        return result;
+    }
+    // Compare the current tile with the surrounded tiles
+    public static boolean checkPos(int predicate, Tile[] tiles) {
+        for (Tile t : tiles) {
+            if (t != null && t.value() == predicate) {
+                return true;
+            }
         }
         return false;
     }
@@ -211,7 +214,9 @@ public class Model extends Observable {
                 if (b.tile(col, row) == null) {
                     continue;
                 };
-                if (checkPos(b, col, row, maxCol, maxRow)) {
+                Tile[] surroundedPos = validPos(b, col, row, maxCol, maxRow);
+                int current = b.tile(col, row).value();
+                if (checkPos(current, surroundedPos)) {
                     return true;
                 }
             }
