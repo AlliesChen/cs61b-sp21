@@ -1,5 +1,6 @@
 package game2048;
 
+import java.io.PrintStream;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -109,30 +110,33 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
+        board.setViewingPerspective(side);
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
         for (int col = 0; col < board.size(); col += 1) {
-            boolean isMerged = false;
-            int first = 0;
-            for (int row = board.size() - 1; row >= 0; row -= 1) {
-                Tile t = board.tile(col, row);
-                if (t != null) {
-                    if (isMerged == false && t.value() == first) {
-                        first += t.value();
-                        score += first;
-                        isMerged = true;
+            int targetMergeRow = board.size() - 1;
+            for (int row = targetMergeRow - 1; row >= 0; row--) {
+                Tile now = board.tile(col, row);
+                if (now != null) {
+                    if (board.tile(col, targetMergeRow) == null) {
+                        board.move(col, targetMergeRow, now);
+                        changed = true;
+                    } else if (board.tile(col, targetMergeRow).value() == now.value()) {
+                        board.move(col, targetMergeRow, now);
+                        score = score + 2 * now.value();
+                        targetMergeRow--;
+                        changed = true;
+                    } else {
+                        targetMergeRow--;
+                        board.move(col, targetMergeRow, now);
+                        changed = true;
                     }
-                    // set for merging
-                    if (first == 0) {
-                        first += t.value();
-                    }
-                    board.move(col, 3, t);
-                    changed = true;
                 }
+
             }
         }
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
