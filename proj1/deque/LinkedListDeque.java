@@ -24,8 +24,8 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     @Override
     public void addFirst(T item) {
-        Node first = sentinel.next;
-        first.prev = new Node(item, first);
+        Node<T> first = sentinel.next;
+        first.prev = new Node<>(item, first);
         sentinel.next = first.prev;
         first.prev.prev = sentinel;
         size = size + 1;
@@ -33,10 +33,10 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     @Override
     public void addLast(T item) {
-        Node last = sentinel.prev;
-        last.next = new Node(item, sentinel);
+        Node<T> last = sentinel.prev;
+        last.next = new Node<>(item, sentinel);
         sentinel.prev = last.next;
-        last.next.next = sentinel;
+        last.next.prev = last;
         size = size + 1;
     }
 
