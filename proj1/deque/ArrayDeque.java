@@ -17,7 +17,7 @@ public class ArrayDeque<T> implements Deque<T> {
         T[] dest = (T[]) new Object[cap];
         System.arraycopy(items, 0, dest, 0, items.length);
         nextFirst = dest.length - 1;
-        nextLast = size + 1;
+        nextLast = items.length;
         items = dest;
     }
 
@@ -84,10 +84,10 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public T get(int index) {
-        if (index < 0 || index > size - 1) {
+        if (index < 0 || index > size) {
             return null;
         }
-        int itemIndex = getFirst() + index % items.length;
+        int itemIndex = (getFirst() + index) % items.length;
         return items[itemIndex];
     }
 
