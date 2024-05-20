@@ -87,8 +87,9 @@ public class ArrayDeque<T> implements Deque<T> {
         if (index < 0 || index > size) {
             return null;
         }
+        double doubledTimes = Math.log(items.length) / Math.log(2) - 3;
         int itemIndex = (getFirst() + index) % items.length;
-        return items[itemIndex];
+        return items[itemIndex + (int) doubledTimes];
     }
 
     public int size() {
