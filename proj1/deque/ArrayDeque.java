@@ -2,107 +2,102 @@ package deque;
 
 public class ArrayDeque<T> implements Deque<T> {
     private T[] items;
-    private int size;
     private int nextFirst;
     private int nextLast;
+    private int size;
+    private static final int INITIAL_CAPACITY = 8;
 
     public ArrayDeque() {
-        items = (T[]) new Object[8];
+        items = (T[]) new Object[INITIAL_CAPACITY];
+        nextFirst = -1;
+        nextLast = -1;
         size = 0;
-        nextFirst = 0;
-        nextLast = 1;
     }
 
-    private void resize(int cap) {
-        T[] dest = (T[]) new Object[cap];
-        if (nextFirst > nextLast) {
-            System.arraycopy(items, nextFirst + 1, dest, 0, items.length);
-            System.arraycopy(items, 0, dest, 0, items.length);
-        } else if (nextFirst < nextLast) {
+    public boolean isFull() {
+        return size == items.length;
+    }
 
-        } else {
-            System.arraycopy(items, 0, dest, 0, items.length);
+    private void resize(int newCapacity) {
+        T[] newItems = (T[]) new Object[newCapacity];
+        for (int i = 0; i < size; i++) {
+            newItems[i] = items[(nextFirst + i) % items.length];
         }
-        nextFirst = dest.length - 1;
-        nextLast = items.length - 1;
-        items = dest;
+        nextFirst = 0;
+        nextLast = size - 1;
+        items = newItems;
     }
 
     public void addFirst(T item) {
-        items[nextFirst] = item;
-        size += 1;
-        if (nextFirst - 1 < 0) {
-            nextFirst = items.length - 1;
-        } else {
-            nextFirst -= 1;
+        if (isFull()) {
+            resize(items.length * 2);
         }
-        if (nextFirst == nextLast && items[nextFirst] != null) {
-            resize(size * 2);
-        }
-    }
-    public void addLast(T item) {
-        items[nextLast] = item;
-        size += 1;
-        if (nextLast + 1 == items.length) {
+        if (isEmpty()) {
+            nextFirst = 0;
             nextLast = 0;
         } else {
-            nextLast += 1;
+            nextFirst = (nextFirst - 1 + items.length) % items.length;
         }
-        if (nextLast == nextFirst && items[nextLast] != null) {
-            resize(size * 2);
+        items[nextFirst] = item;
+        size += 1;
+    }
+    public void addLast(T item) {
+        if (isFull()) {
+            resize(items.length * 2);
         }
+        if (isEmpty()) {
+            nextFirst = 0;
+            nextLast = 0;
+        } else {
+            nextLast = (nextLast + 1) % items.length;
+        }
+        items[nextLast] = item;
+        size += 1;
     }
 
     public T removeFirst() {
         if (isEmpty()) {
             return null;
         }
-        if (nextFirst + 1 == items.length) {
-            nextFirst = 0;
-        } else {
-            nextFirst += 1;
-        }
-        T item = items[nextFirst];
+        T removedItem = items[nextFirst];
         items[nextFirst] = null;
-        size -= 1;
-        if (size == (items.length / 2)) {
-            resize(size);
+        if (nextFirst == nextLast) {
+            nextFirst = -1;
+            nextLast = -1;
+        } else {
+            nextFirst = (nextFirst + 1) % items.length;
         }
-        return item;
+        if (size > 0 && size == (items.length / 4) && items.length > INITIAL_CAPACITY) {
+            resize(Math.max(items.length / 2, INITIAL_CAPACITY));
+        }
+        size -= 1;
+        return removedItem;
     }
 
     public T removeLast() {
         if (isEmpty()) {
             return null;
         }
-        if (items[nextLast - 1] == null) {
-            nextLast = items.length - 1;
-        } else {
-            nextLast -= 1;
-        }
-        T item = items[nextLast];
+        T removedItem = items[nextLast];
         items[nextLast] = null;
+        if (nextFirst == nextLast) {
+            nextFirst = -1;
+            nextLast = -1;
+        } else {
+            nextLast = (nextLast - 1 + items.length) % items.length;
+        }
         size -= 1;
-        if (size == (items.length / 2)) {
-            resize(size);
+        if (size > 0 && size == (items.length / 4) && items.length > INITIAL_CAPACITY) {
+            resize(Math.max(items.length / 2, INITIAL_CAPACITY));
         }
-        return item;
-    }
-
-    private int getFirst() {
-        if (nextFirst + 1 > items.length) {
-            return 0;
-        }
-        return nextFirst + 1;
+        return removedItem;
     }
 
     public T get(int index) {
-        if (index < 0 || index > size) {
+        if (index < 0 || index >= size) {
             return null;
         }
-        double doubledTimes = Math.log(items.length) / Math.log(2) - 3;
-        int itemIndex = (getFirst() + index) % items.length;
-        return items[itemIndex + (int) doubledTimes];
+        return items[(nextFirst + index) % items.length];
     }
 
     public int size() {

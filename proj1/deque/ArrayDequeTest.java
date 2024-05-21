@@ -34,7 +34,7 @@ public class ArrayDequeTest {
         }
         assertEquals(13, actual.size());
 
-        int thirteenth = actual.get(13);
+        int thirteenth = actual.get(12);
         assertEquals(12, thirteenth);
 
         System.out.println("Printing out deque: ");
@@ -76,7 +76,7 @@ public class ArrayDequeTest {
         }
         assertEquals(1000000, actual.size());
         int oneToMillionth = actual.get(999999);
-        assertEquals(999998, oneToMillionth);
+        assertEquals(999999, oneToMillionth);
         int removedLast = actual.removeLast();
         assertEquals(999999, removedLast);
     }
@@ -93,10 +93,10 @@ public class ArrayDequeTest {
             }
         }
         assertEquals(3, actual.size());
-
-        System.out.println(actual.get(0));
-        System.out.println(actual.get(1));
-        System.out.println(actual.get(2));
+        // Check if any garbage data remain.
+        assertEquals(0, (int) actual.get(0));
+        assertEquals(0, (int) actual.get(1));
+        assertEquals(0, (int) actual.get(2));
         actual.printDeque();
     }
 }
