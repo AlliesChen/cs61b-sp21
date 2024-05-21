@@ -80,4 +80,23 @@ public class ArrayDequeTest {
         int removedLast = actual.removeLast();
         assertEquals(999999, removedLast);
     }
+
+    @Test
+    public void repeatedAddRemoveTest() {
+        ArrayDeque<Integer> actual = new ArrayDeque<>();
+        for (int i = 0; i < 3; i ++) {
+            for (int a = 0; a < 100; a++) {
+                actual.addLast(a);
+            }
+            for (int r = 0; r < 99; r++) {
+                actual.removeLast();
+            }
+        }
+        assertEquals(3, actual.size());
+
+        System.out.println(actual.get(0));
+        System.out.println(actual.get(1));
+        System.out.println(actual.get(2));
+        actual.printDeque();
+    }
 }

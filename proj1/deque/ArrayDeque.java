@@ -15,9 +15,16 @@ public class ArrayDeque<T> implements Deque<T> {
 
     private void resize(int cap) {
         T[] dest = (T[]) new Object[cap];
-        System.arraycopy(items, 0, dest, 0, items.length);
+        if (nextFirst > nextLast) {
+            System.arraycopy(items, nextFirst + 1, dest, 0, items.length);
+            System.arraycopy(items, 0, dest, 0, items.length);
+        } else if (nextFirst < nextLast) {
+
+        } else {
+            System.arraycopy(items, 0, dest, 0, items.length);
+        }
         nextFirst = dest.length - 1;
-        nextLast = items.length;
+        nextLast = items.length - 1;
         items = dest;
     }
 
@@ -29,7 +36,7 @@ public class ArrayDeque<T> implements Deque<T> {
         } else {
             nextFirst -= 1;
         }
-        if (nextFirst == nextLast) {
+        if (nextFirst == nextLast && items[nextFirst] != null) {
             resize(size * 2);
         }
     }
@@ -41,7 +48,7 @@ public class ArrayDeque<T> implements Deque<T> {
         } else {
             nextLast += 1;
         }
-        if (nextLast == nextFirst) {
+        if (nextLast == nextFirst && items[nextLast] != null) {
             resize(size * 2);
         }
     }
@@ -58,6 +65,9 @@ public class ArrayDeque<T> implements Deque<T> {
         T item = items[nextFirst];
         items[nextFirst] = null;
         size -= 1;
+        if (size == (items.length / 2)) {
+            resize(size);
+        }
         return item;
     }
 
@@ -65,14 +75,17 @@ public class ArrayDeque<T> implements Deque<T> {
         if (isEmpty()) {
             return null;
         }
-        if (nextLast - 1 < 0) {
-            nextLast = items.length;
+        if (items[nextLast - 1] == null) {
+            nextLast = items.length - 1;
         } else {
             nextLast -= 1;
         }
         T item = items[nextLast];
         items[nextLast] = null;
         size -= 1;
+        if (size == (items.length / 2)) {
+            resize(size);
+        }
         return item;
     }
 
