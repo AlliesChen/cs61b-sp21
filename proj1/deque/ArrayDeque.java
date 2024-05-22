@@ -113,6 +113,28 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         System.out.println();
     }
 
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ArrayDeque)) {
+            return false;
+        }
+        ArrayDeque<?> ad = (ArrayDeque<?>) o;
+        if (ad.size() != size) {
+            return false;
+        }
+        for (int i = 0; i < size; i+= 1) {
+            if (ad.get(i) != get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private class ADequeIterator implements Iterator<T> {
         private int index;
         ADequeIterator() {
