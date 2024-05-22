@@ -68,7 +68,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         if (node == sentinel) {
             return;
         }
-        for (int i = 0; i < size; i+= 1) {
+        for (int i = 0; i < size; i += 1) {
             items[i] = node.item.toString();
             node = node.next;
         }
@@ -80,7 +80,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
             return null;
         }
         Node<T> current = sentinel.next;
-        for (int i = 0; i < size; i+= 1) {
+        for (int i = 0; i < size; i += 1) {
             if (i == index) {
                 return current.item;
             }
@@ -92,7 +92,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class LListDequeIterator implements Iterator<T> {
         private Node<T> node;
 
-        public LListDequeIterator() {
+        LListDequeIterator() {
             node = sentinel.next;
         }
 

@@ -16,7 +16,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
-    public boolean isFull() {
+    private boolean isFull() {
         return size == items.length;
     }
 
@@ -115,7 +115,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     private class ADequeIterator implements Iterator<T> {
         private int index;
-        public ADequeIterator() {
+        ADequeIterator() {
             index = 0;
         }
 
