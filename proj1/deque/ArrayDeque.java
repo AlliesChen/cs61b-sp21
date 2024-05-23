@@ -69,10 +69,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         } else {
             nextFirst = (nextFirst + 1) % items.length;
         }
+        size -= 1;
         if (size > 0 && size == (items.length / 4) && items.length > INITIAL_CAPACITY) {
             resize(Math.max(items.length / 2, INITIAL_CAPACITY));
         }
-        size -= 1;
         return removedItem;
     }
 

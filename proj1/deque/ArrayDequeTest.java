@@ -71,14 +71,18 @@ public class ArrayDequeTest {
     @Test
     public void millionInsertionAndRemoveLastTest() {
         ArrayDeque<Integer> actual = new ArrayDeque<>();
-        for (int i = 0; i < 1000000; i ++) {
+        int TEST_SIZE = 1000000;
+        for (int i = 0; i < TEST_SIZE; i += 1) {
             actual.addLast(i);
         }
-        assertEquals(1000000, actual.size());
-        int oneToMillionth = actual.get(999999);
-        assertEquals(999999, oneToMillionth);
-        int removedLast = actual.removeLast();
-        assertEquals(999999, removedLast);
+        assertEquals(TEST_SIZE, actual.size());
+
+        int millionth = actual.get(TEST_SIZE - 1);
+        assertEquals("The millionth should equal to the size minus 1", TEST_SIZE - 1, millionth);
+        for (int i = 0; i < TEST_SIZE - 1; i += 1) {
+            int removed = actual.removeLast();
+            assertEquals(TEST_SIZE - 1 - i, removed);
+        }
     }
 
     @Test
@@ -122,5 +126,48 @@ public class ArrayDequeTest {
         ad.addFirst(1);
         lld.addFirst(1);
         assertTrue(ad.equals(lld));
+    }
+
+    @Test
+    public void randomAddRemoveTest() {
+        int TEST_SIZE = 10000;
+        ArrayDeque<Integer> actual = new ArrayDeque<>();
+        for (int i = 0; i < TEST_SIZE; i += 1) {
+            double n = Math.random() * 2 + 1;
+            int randomCase = (int) (Math.floor(n));
+            switch (randomCase) {
+                case 1:
+                    actual.addFirst(i);
+                    break;
+                case 2:
+                    actual.addLast(i);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unexpected input value: " + i);
+            }
+        }
+        assertEquals(TEST_SIZE, actual.size());
+        for (int i = 0; i < TEST_SIZE; i += 1) {
+            double n = Math.random() * 2 + 1;
+            int randomCase = (int) (Math.floor(n));
+            switch (randomCase) {
+                case 1:
+                    int expectedFirst = actual.get(0);
+                    int removedFirst = actual.removeFirst();
+                    assertEquals(expectedFirst, removedFirst);
+                    assertNotNull(expectedFirst);
+                    assertNotNull(removedFirst);
+                    break;
+                case 2:
+                    int expectedLast = actual.get(actual.size() - 1);
+                    int removedLast = actual.removeLast();
+                    assertEquals(expectedLast, removedLast);
+                    assertNotNull(expectedLast);
+                    assertNotNull(removedLast);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unexpected input value: " + i);
+            }
+        }
     }
 }
