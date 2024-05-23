@@ -138,6 +138,10 @@ public class LinkedListDequeTest {
 
         lld.addFirst(1);
         ad.addFirst(1);
+        lld.addLast(2);
+        ad.addLast(2);
+        lld.removeFirst();
+        ad.removeFirst();
         assertTrue(lld.equals(ad));
     }
 }

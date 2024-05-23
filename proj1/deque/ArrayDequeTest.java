@@ -124,7 +124,11 @@ public class ArrayDequeTest {
         assertTrue(ad.equals(lld));
 
         ad.addFirst(1);
+        ad.addLast(2);
         lld.addFirst(1);
+        lld.addLast(2);
+        ad.removeFirst();
+        lld.removeFirst();
         assertTrue(ad.equals(lld));
     }
 

@@ -112,27 +112,26 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         System.out.println();
     }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
             return false;
-        }
-        if (o == this) {
+        } else if (o == this) {
             return true;
-        }
-        if (!(o instanceof ArrayDeque || o instanceof LinkedListDeque)) {
-            return false;
-        }
-        Deque<?> ad = (Deque<?>) o;
-        if (ad.size() != size) {
-            return false;
-        }
-        for (int i = 0; i < size; i += 1) {
-            if (ad.get(i) != get(i)) {
+        } else if (o instanceof Deque<?>) {
+            Deque casted = (Deque) o;
+            if (this.size != casted.size()) {
                 return false;
             }
+            for (int i = 0; i < size; i += 1) {
+                if (get(i) != casted.get(i)) {
+                    return false;
+                }
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     private class ADequeIterator implements Iterator<T> {
