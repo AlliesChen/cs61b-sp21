@@ -112,4 +112,15 @@ public class ArrayDequeTest {
         assertTrue(ad1.equals(ad2));
         assertTrue(ad2.equals(ad1));
     }
+
+    @Test
+    public void equalsADequeAndLLDequeTest() {
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        assertTrue(ad.equals(lld));
+
+        ad.addFirst(1);
+        lld.addFirst(1);
+        assertTrue(ad.equals(lld));
+    }
 }
