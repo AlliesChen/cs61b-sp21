@@ -99,4 +99,17 @@ public class ArrayDequeTest {
         assertEquals(0, (int) actual.get(2));
         actual.printDeque();
     }
+
+    @Test
+    public void equalsADequeTest() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+        ArrayDeque<Integer> ad2 = new ArrayDeque<>();
+        assertTrue(ad1.equals(ad2));
+        assertTrue(ad2.equals(ad1));
+
+        ad1.addFirst(1);
+        ad2.addFirst(1);
+        assertTrue(ad1.equals(ad2));
+        assertTrue(ad2.equals(ad1));
+    }
 }

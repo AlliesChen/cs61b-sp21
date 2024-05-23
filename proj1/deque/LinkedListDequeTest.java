@@ -36,7 +36,7 @@ public class LinkedListDequeTest {
     }
 
     @Test
-    /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
+    /* Adds an item, then removes an item, and ensures that dll is empty afterward. */
     public void addRemoveTest() {
 
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
@@ -103,7 +103,7 @@ public class LinkedListDequeTest {
     @Test
     /* Add large number of elements to deque; check if order is correct. */
     public void bigLLDequeTest() {
-        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
         for (int i = 0; i < 1000000; i++) {
             lld1.addLast(i);
         }
@@ -115,5 +115,18 @@ public class LinkedListDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
+
+    @Test
+    public void equalsLLDequeTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        assertTrue(lld1.equals(lld2));
+        assertTrue(lld2.equals(lld1));
+
+        lld1.addFirst(1);
+        lld2.addFirst(1);
+        assertTrue(lld1.equals(lld2));
+        assertTrue(lld2.equals(lld1));
     }
 }
