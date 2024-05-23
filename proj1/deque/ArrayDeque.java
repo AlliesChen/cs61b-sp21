@@ -112,7 +112,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         System.out.println();
     }
-
+    @Override
     public boolean equals(Object o) {
         if (o == null) {
             return false;
