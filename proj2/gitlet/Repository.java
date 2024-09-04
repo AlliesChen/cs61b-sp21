@@ -26,4 +26,15 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
+    // create a .gitlet directory
+    public void init() {
+        if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        }
+        GITLET_DIR.mkdir();
+        // get the current time
+        long currentTime = System.currentTimeMillis();
+        Commit initialCommit = new Commit("initial commit");
+    }
 }
