@@ -18,13 +18,25 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
+                // DONE: handle the `init` command
                 repo.init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                // DONE: handle the `add [filename]` command
+
+                repo.add()
                 break;
             // TODO: FILL THE REST IN
+            default:
+                System.out.println("No command with that name exists.");
+                System.exit(0);
+        }
+    }
+
+    public static void checkArgumentsEnough(String[] args, int num) {
+        if (args.length != num) {
+            System.out.println("Incorrect operands.");
+            System.exit(0);
         }
     }
 }

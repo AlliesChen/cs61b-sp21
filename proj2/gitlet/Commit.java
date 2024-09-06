@@ -33,24 +33,27 @@ public class Commit implements Serializable {
     /** The unique identifier (SHA-1 hash) for this commit. */
     private String uid;
 
-    /* TODO: fill in the rest of this class. */
+    /* DONE: fill in the rest of this class. */
     /** Commit constructor for initial commit (no parents). */
+    public Commit(String message) {
+        this.message = message;
+        this.parents = new ArrayList<>();
+        this.fileSnapshot = new TreeMap<>();
+
+        // Generate a timestamp for current time
+        this.timestamp = generateTimestamp();
+
+        // Generate the unique ID (UID)
+        this.uid = generateUID();
+    }
+    /** Commit constructor for commits with parents. */
     public Commit(String message, List<String> parents, TreeMap<String, String> snapshot) {
         this.message = message;
+        this.parents = parents;
+        this.fileSnapshot = snapshot;
 
-        // Ensure parents is never null; use an empty ArrayList if no parents
-        if (parents == null) {
-            this.parents = new ArrayList<>();
-        } else {
-            this.parents = parents;
-        }
-
-        this.fileSnapshot = snapshot != null ? snapshot : new TreeMap<>();
-
-        // get the current time
-        Date now = new Date(System.currentTimeMillis());
-        DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
-        this.timestamp = dateFormat.format(now);
+        // Generate a timestamp for current time
+        this.timestamp = generateTimestamp();
 
         // Generate the unique ID (UID)
         this.uid = generateUID();
@@ -65,6 +68,13 @@ public class Commit implements Serializable {
                 parents.toString(),
                 fileSnapshot.toString()
         );
+    }
+
+    /** Generate a timestamp for commit */
+    private String generateTimestamp() {
+        Date now = new Date(System.currentTimeMillis());
+        DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+        return dateFormat.format(now);
     }
 
     /** Getters for commit attributes */
