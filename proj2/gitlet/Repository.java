@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 import static gitlet.Utils.*;
 
@@ -36,10 +38,21 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         }
+        // Create the directory structure for the Gitlet VCS
         GITLET_DIR.mkdir();
         OBJECTS_DIR.mkdir();
         REFS_DIR.mkdir();
 
-        Commit initialCommit = new Commit("initial commit", null, null);
+        // Create the initial commit with no parents
+        Commit initialCommit = new Commit("initial commit", new ArrayList<>(), new TreeMap<>());
+
+        // Serialize and store the initial commit
+        File commitFile = new File(OBJECTS_DIR, initialCommit.getUid());
+        Utils.writeObject(commitFile, initialCommit);
+
+        // Set up the HEAD to point to the master branch reference
+        File masterBranch = new File(REFS_DIR, "master");
+        Utils.writeContents(masterBranch, initialCommit.getUid());
+        Utils.writeContents(HEAD_FILE, "refs/heads/master");
     }
 }

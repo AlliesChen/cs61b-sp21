@@ -23,26 +23,68 @@ public class Commit implements Serializable {
      */
 
     /** The message of this Commit. */
-    private final String uid;
-    private final String message;
-    private final String timeStamp;
-    private final Map<String, String> pathToBlobId;
-    private final List<String> parents;
+    private String message;
+    /** The timestamp when this commit was created. */
+    private String timestamp;
+    /** The parent commits. For single commits, this list will have one parent. */
+    private List<String> parents;
+    /** A map from file name to its blob hash, sorted by file name. */
+    private TreeMap<String, String> fileSnapshot;
+    /** The unique identifier (SHA-1 hash) for this commit. */
+    private String uid;
 
     /* TODO: fill in the rest of this class. */
-    public Commit(String message, Map<String, String> pathToBlobId, List<String> parents) {
+    /** Commit constructor for initial commit (no parents). */
+    public Commit(String message, List<String> parents, TreeMap<String, String> snapshot) {
         this.message = message;
+
+        // Ensure parents is never null; use an empty ArrayList if no parents
+        if (parents == null) {
+            this.parents = new ArrayList<>();
+        } else {
+            this.parents = parents;
+        }
+
+        this.fileSnapshot = snapshot != null ? snapshot : new TreeMap<>();
+
         // get the current time
         Date now = new Date(System.currentTimeMillis());
         DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
-        this.timeStamp = dateFormat.format(now);
-        this.pathToBlobId = pathToBlobId;
-        this.parents = parents;
-        this.uid = Utils.sha1(
+        this.timestamp = dateFormat.format(now);
+
+        // Generate the unique ID (UID)
+        this.uid = generateUID();
+    }
+
+    /** Generate an SHA-1 hash as the commits' UID. */
+    private String generateUID() {
+        // Generate the SHA-1 hash (assuming Utils.sha1 exists)
+        return Utils.sha1(
                 message,
-                this.timeStamp,
-                this.pathToBlobId.toString(),
-                this.parents.toString()
+                timestamp,
+                parents.toString(),
+                fileSnapshot.toString()
         );
+    }
+
+    /** Getters for commit attributes */
+    public String getUid() {
+        return uid;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public List<String> getParents() {
+        return parents;
+    }
+
+    public TreeMap<String, String> getFileSnapshot() {
+        return fileSnapshot;
     }
 }
