@@ -23,8 +23,8 @@ public class Main {
                 break;
             case "add":
                 // DONE: handle the `add [filename]` command
-
-                repo.add()
+                checkArgumentsQty(args, 2);
+                repo.add(args[1]);
                 break;
             // TODO: FILL THE REST IN
             default:
@@ -33,7 +33,7 @@ public class Main {
         }
     }
 
-    public static void checkArgumentsEnough(String[] args, int num) {
+    public static void checkArgumentsQty(String[] args, int num) {
         if (args.length != num) {
             System.out.println("Incorrect operands.");
             System.exit(0);

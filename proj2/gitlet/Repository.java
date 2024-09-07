@@ -59,7 +59,7 @@ public class Repository {
         Utils.writeObject(commitFile, initialCommit);
 
         // Set up the HEAD to point to the master branch reference
-        File masterBranch = new File(REFS_DIR, "master");
+        File masterBranch = new File(HEADS_DIR, "master");
         Utils.writeContents(masterBranch, initialCommit.getUid());
         Utils.writeContents(HEAD_FILE, "refs/heads/master");
     }
@@ -77,7 +77,6 @@ public class Repository {
             System.out.println("File does not exist.");
             System.exit(0);
         }
-
         // Generate the file's blob hash
         byte[] fileContents = Utils.readContents(fileToAdd);
         String currentFileHash = Utils.sha1(fileContents);
@@ -110,17 +109,14 @@ public class Repository {
         // Read the current branch from the HEAD file
         String branchName = Utils.readContentsAsString(HEAD_FILE).trim();
 
-        // Find the file corresponding to the branch in HEADS_DIR
-        File branchFile = join(HEADS_DIR, branchName);
-
+        // Find the file corresponding to the branch in GITLET_DIR
+        File branchFile = join(GITLET_DIR, branchName);
         // Read the commit ID stored in the branch file
-        String latestCommitID = Utils.readContentsAsString(branchFile).trim();
-
+        String latestCommitId = Utils.readContentsAsString(branchFile).trim();
         // Retrieve the corresponding commit object from the objects directory
-        File commitFile = join(OBJECTS_DIR, latestCommitID);
-        Commit latestCommit = Utils.readObject(commitFile, Commit.class);
+        File commitFile = join(OBJECTS_DIR, latestCommitId);
 
-        return latestCommit;
+        return Utils.readObject(commitFile, Commit.class);
     }
 
     // Load the staging area from disk
