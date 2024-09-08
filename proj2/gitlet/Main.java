@@ -27,6 +27,9 @@ public class Main {
                 repo.add(args[1]);
                 break;
             // TODO: FILL THE REST IN
+            case "commit":
+                checkArgumentsQty(args, 2);
+                repo.commit(args[1]);
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

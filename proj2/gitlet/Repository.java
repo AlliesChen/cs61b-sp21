@@ -1,10 +1,10 @@
 package gitlet;
 
-import jdk.jshell.execution.Util;
-
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -35,7 +35,8 @@ public class Repository {
     public static final File HEADS_DIR = join(REFS_DIR, "heads");
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
     public static final File STAGING_AREA_FILE = join(GITLET_DIR, "staging_area");
-
+    public static final String DEFAULT_BRANCH_NAME = "master";
+    public static final String DEFAULT_HEAD_POINTER = "refs/heads/" + DEFAULT_BRANCH_NAME;
     private StagingArea stagingArea;
 
     /* TODO: fill in the rest of this class. */
@@ -53,19 +54,18 @@ public class Repository {
 
         // Create the initial commit with no parents
         Commit initialCommit = new Commit("initial commit");
+        saveCommit(initialCommit);
 
-        // Serialize and store the initial commit
-        File commitFile = new File(OBJECTS_DIR, initialCommit.getUid());
-        Utils.writeObject(commitFile, initialCommit);
+        // Set default branch reference
+        File branchFile = new File(HEADS_DIR, DEFAULT_BRANCH_NAME);
+        updateBranchReference(branchFile, initialCommit.getUid());
 
         // Set up the HEAD to point to the master branch reference
-        File masterBranch = new File(HEADS_DIR, "master");
-        Utils.writeContents(masterBranch, initialCommit.getUid());
-        Utils.writeContents(HEAD_FILE, "refs/heads/master");
+        Utils.writeContents(HEAD_FILE, DEFAULT_HEAD_POINTER);
     }
 
     public void add(String fileName) {
-        loadStagingArea(); // Load the staging area from disk
+        this.stagingArea = loadStagingArea(); // Load the staging area from disk
 
         // Check if the file path is absolute or relative
         File fileToAdd = Paths.get(fileName).isAbsolute()
@@ -85,7 +85,7 @@ public class Repository {
         Commit latestCommit = getLatestCommit();
         TreeMap<String, String> latestSnapshot = latestCommit != null
                 ? latestCommit.getFileSnapshot()
-                : new TreeMap();
+                : new TreeMap<>();
 
         // Compare the current file hash with the latest commit's file hash
         if (latestSnapshot.containsKey(fileName)) {
@@ -104,13 +104,57 @@ public class Repository {
         saveStagingArea();
     }
 
-    // Retrieve the latest commit from the current branch
-    public Commit getLatestCommit() {
-        // Read the current branch from the HEAD file
-        String branchName = Utils.readContentsAsString(HEAD_FILE).trim();
+    public void commit(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0); // Abort the commit
+        }
+
+        // Load the staging area
+        this.stagingArea = loadStagingArea();
+
+        if (stagingArea.getStagedFiles().isEmpty() && stagingArea.getRemovedFiles().isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        // Get the current HEAD commit
+        Commit parentCommit = getLatestCommit();
+        TreeMap<String, String> fileSnapshot = new TreeMap<>();
+        List<String> parentUids = new ArrayList<>();
+
+        if (parentCommit != null) {
+            fileSnapshot.putAll(parentCommit.getFileSnapshot());
+            parentUids.add(parentCommit.getUid());
+        }
+        fileSnapshot.putAll(stagingArea.getStagedFiles());
+
+        for (String fileName : stagingArea.getRemovedFiles()) {
+            fileSnapshot.remove(fileName);
+        }
+
+        Commit newCommit = new Commit(
+                message,
+                parentUids,
+                fileSnapshot
+        );
+        saveCommit(newCommit);
+        File branchFile = getCurrentBranchReference();
+        updateBranchReference(branchFile, newCommit.getUid());
+    }
+
+    public File getCurrentBranchReference() {
+        // Read the relative path of the branch reference from the HEAD file
+        String branchRef = Utils.readContentsAsString(HEAD_FILE).trim();
 
         // Find the file corresponding to the branch in GITLET_DIR
-        File branchFile = join(GITLET_DIR, branchName);
+        return join(GITLET_DIR, branchRef);
+    }
+
+    // Retrieve the latest commit from the current branch
+    public Commit getLatestCommit() {
+        File branchFile = getCurrentBranchReference();
+
         // Read the commit ID stored in the branch file
         String latestCommitId = Utils.readContentsAsString(branchFile).trim();
         // Retrieve the corresponding commit object from the objects directory
@@ -119,13 +163,24 @@ public class Repository {
         return Utils.readObject(commitFile, Commit.class);
     }
 
+    /**
+     * Serializes and saves a commit to the objects directory.
+     * @param commit The commit object to be saved.
+     */
+    public void saveCommit(Commit commit) {
+        File commitFile = new File(OBJECTS_DIR, commit.getUid());
+        Utils.writeObject(commitFile, commit);
+    }
+
+    public void updateBranchReference(File branchFile, String commitId) {
+        Utils.writeContents(branchFile, commitId);
+    }
+
     // Load the staging area from disk
-    public void loadStagingArea() {
-        if (STAGING_AREA_FILE.exists()) {
-            stagingArea = Utils.readObject(STAGING_AREA_FILE, StagingArea.class);
-        } else {
-            stagingArea = new StagingArea(); // New staging area if none exists yet
-        }
+    public StagingArea loadStagingArea() {
+        return STAGING_AREA_FILE.exists()
+            ? Utils.readObject(STAGING_AREA_FILE, StagingArea.class)
+            : new StagingArea(); // New staging area if none exists yet
     }
 
     // Save the staging area to disk
@@ -133,3 +188,4 @@ public class Repository {
         Utils.writeObject(STAGING_AREA_FILE, stagingArea);
     }
 }
+
