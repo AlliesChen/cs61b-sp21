@@ -141,6 +141,7 @@ public class Repository {
         saveCommit(newCommit);
         File branchFile = getCurrentBranchReference();
         updateBranchReference(branchFile, newCommit.getUid());
+        removeStagingArea();
     }
 
     public File getCurrentBranchReference() {
@@ -181,6 +182,16 @@ public class Repository {
         return STAGING_AREA_FILE.exists()
             ? Utils.readObject(STAGING_AREA_FILE, StagingArea.class)
             : new StagingArea(); // New staging area if none exists yet
+    }
+
+    public void removeStagingArea() {
+        String pathToBeRemoved = STAGING_AREA_FILE.getAbsolutePath();
+        boolean isRemoved = STAGING_AREA_FILE.delete();
+        if (isRemoved) {
+            System.out.println("File removed: " + pathToBeRemoved);
+        } else {
+            System.out.println("File is not removed: " + pathToBeRemoved);
+        }
     }
 
     // Save the staging area to disk
