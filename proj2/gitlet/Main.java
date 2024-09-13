@@ -14,6 +14,7 @@ public class Main {
             System.out.println("Please enter a command");
             System.exit(0);
         }
+        
         Repository repo = new Repository();
         String firstArg = args[0];
         switch(firstArg) {
@@ -26,10 +27,12 @@ public class Main {
                 checkArgumentsQty(args, 2);
                 repo.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
             case "commit":
                 checkArgumentsQty(args, 2);
                 repo.commit(args[1]);
+                break;
+            case "checkout":
+                handleCheckout(args, repo);
                 break;
             default:
                 System.out.println("No command with that name exists.");
@@ -39,6 +42,21 @@ public class Main {
 
     public static void checkArgumentsQty(String[] args, int num) {
         if (args.length != num) {
+            System.out.println("Incorrect operands.");
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Handles the checkout command with various forms.
+     * @param args The command-line arguments.
+     */
+    public static void handleCheckout(String[] args, Repository repository) {
+        if (args.length == 2) { // checkout [branch name]
+        } else if (args.length == 3) { // checkout -- [filename]
+            repository.checkoutFile(args[2]);
+        } else if (args.length == 4) { // checkout [commit id] -- [filename]
+        } else {
             System.out.println("Incorrect operands.");
             System.exit(0);
         }

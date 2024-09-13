@@ -144,6 +144,21 @@ public class Repository {
         removeStagingArea();
     }
 
+    public void checkoutFile(String fileName) {
+        Commit commit = getLatestCommit();
+        TreeMap<String, String> snapshot = commit.getFileSnapshot();
+        if (!snapshot.containsKey(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        String blobHash = snapshot.get(fileName);
+        System.out.println(blobHash);
+        File blobFile = join(OBJECTS_DIR, blobHash);
+        byte[] blobContents = Utils.readContents(blobFile);
+        Utils.writeContents(new File(CWD,fileName), blobContents);
+        System.out.println("Restored " + fileName + " to " + commit.getUid());
+    }
+
     public File getCurrentBranchReference() {
         // Read the relative path of the branch reference from the HEAD file
         String branchRef = Utils.readContentsAsString(HEAD_FILE).trim();
@@ -188,7 +203,7 @@ public class Repository {
         String pathToBeRemoved = STAGING_AREA_FILE.getAbsolutePath();
         boolean isRemoved = STAGING_AREA_FILE.delete();
         if (isRemoved) {
-            System.out.println("File removed: " + pathToBeRemoved);
+            // System.out.println("File removed: " + pathToBeRemoved);
         } else {
             System.out.println("File is not removed: " + pathToBeRemoved);
         }
