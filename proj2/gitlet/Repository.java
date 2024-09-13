@@ -98,7 +98,11 @@ public class Repository {
                 return;
             }
         }
-
+        // Store the blob (file contents) in the object directory
+        File blobFile = Utils.join(OBJECTS_DIR, currentFileHash);
+        if (!blobFile.exists()) {
+            Utils.writeContents(blobFile, fileContents); // Store the file content under its hash
+        }
         // Stage the file for the next commit
         stagingArea.stageFile(fileName, currentFileHash);
         saveStagingArea();
@@ -138,6 +142,7 @@ public class Repository {
                 parentUids,
                 fileSnapshot
         );
+
         saveCommit(newCommit);
         File branchFile = getCurrentBranchReference();
         updateBranchReference(branchFile, newCommit.getUid());
@@ -147,16 +152,25 @@ public class Repository {
     public void checkoutFile(String fileName) {
         Commit commit = getLatestCommit();
         TreeMap<String, String> snapshot = commit.getFileSnapshot();
+        // Check if the file exists in the commit
         if (!snapshot.containsKey(fileName)) {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
+        // Retrieve the blob hash and find the blob file
         String blobHash = snapshot.get(fileName);
-        System.out.println(blobHash);
-        File blobFile = join(OBJECTS_DIR, blobHash);
+        File blobFile = Utils.join(OBJECTS_DIR, blobHash);
+
+        // Handle missing blob files
+        if (!blobFile.exists()) {
+            System.out.println("Blob not found for file: " + fileName);
+            System.exit(0);
+        }
+        // Read the blob contents
         byte[] blobContents = Utils.readContents(blobFile);
+
+        // Write the contents back to the working directory, overwriting any existing file
         Utils.writeContents(new File(CWD,fileName), blobContents);
-        System.out.println("Restored " + fileName + " to " + commit.getUid());
     }
 
     public File getCurrentBranchReference() {
