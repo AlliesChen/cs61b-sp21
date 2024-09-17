@@ -34,6 +34,9 @@ public class Main {
             case "checkout":
                 handleCheckout(args, repo);
                 break;
+            case "log":
+                repo.log();
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
@@ -56,6 +59,7 @@ public class Main {
         } else if (args.length == 3) { // checkout -- [filename]
             repository.checkoutFile(args[2]);
         } else if (args.length == 4) { // checkout [commit id] -- [filename]
+            repository.checkoutFileFromCommit(args[1], args[3]);
         } else {
             System.out.println("Incorrect operands.");
             System.exit(0);

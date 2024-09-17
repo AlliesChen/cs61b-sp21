@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -172,6 +173,93 @@ public class Repository {
         Utils.writeContents(new File(CWD,fileName), blobContents);
     }
 
+    public void checkoutFileFromCommit(String commitId, String filename) {
+        // Retrieve the full commit ID by checking for partial matches if necessary
+        CommitResult commitResult = getFullCommitId(commitId);
+        if (commitResult.getResult() == null) {
+            System.out.println(commitResult.getMessage());
+            System.exit(0);
+        }
+        String fullCommitId = commitResult.getResult();
+        // Retrieve the commit object from the objects directory
+        File commitFile = new File(OBJECTS_DIR, fullCommitId);
+        if (!commitFile.exists()) {
+            System.out.println("Commit not found.");
+            System.exit(0);
+        }
+
+        Commit commit = Utils.readObject(commitFile, Commit.class);
+
+        // Check if the specified file exists in the commit's snapshot
+        TreeMap<String, String> fileSnapshot = commit.getFileSnapshot();
+        if (!fileSnapshot.containsKey(filename)) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+
+        // Retrieve the blob (file content) from the objects directory using its hash
+        String fileHash = fileSnapshot.get(filename);
+        File blobFile = new File(OBJECTS_DIR, fileHash);
+        if (!blobFile.exists()) {
+            System.out.println("File content not found.");
+            System.exit(0);
+        }
+
+        // Restore the file to the working directory
+        byte[] fileContents = Utils.readContents(blobFile);
+        File restoredFile = new File(CWD, filename);
+        Utils.writeContents(restoredFile, fileContents);
+    }
+
+    /**
+     * Prints the history of commits, starting from the current HEAD commit and traversing back to the first commit.
+     */
+    public void log() {
+        // Step 1: Get the latest commit from the current branch (HEAD)
+        Commit currentCommit = getLatestCommit();
+
+        // Step 2: Traverse through the commit history
+        while (currentCommit != null) {
+            // Step 3: Print the commit details
+            printCommitDetails(currentCommit);
+
+            // Move to the parent commit
+            List<String> parents = currentCommit.getParents();
+            if (parents.isEmpty()) {
+                break; // Reached the initial commit
+            }
+
+            // Get the parent commit (assuming one parent for simplicity, adjust for merges)
+            String parentCommitId = parents.get(0);
+            currentCommit = getCommitById(parentCommitId); // Load parent commit by its ID
+        }
+    }
+
+    /**
+     * Prints the details of a commit in the specified format.
+     * @param commit The commit to print.
+     */
+    private void printCommitDetails(Commit commit) {
+        System.out.println("===");
+        System.out.println("commit " + commit.getUid());
+        System.out.println("Date: " + commit.getTimestamp());
+        System.out.println(commit.getMessage());
+        System.out.println();
+    }
+
+    /**
+     * Retrieves a commit by its ID.
+     * @param commitId The unique ID of the commit.
+     * @return The Commit object, or null if not found.
+     */
+    private Commit getCommitById(String commitId) {
+        File commitFile = new File(OBJECTS_DIR, commitId);
+        if (!commitFile.exists()) {
+            return null; // Handle missing commit file appropriately
+        }
+        return Utils.readObject(commitFile, Commit.class);
+    }
+
     public File getCurrentBranchReference() {
         // Read the relative path of the branch reference from the HEAD file
         String branchRef = Utils.readContentsAsString(HEAD_FILE).trim();
@@ -191,6 +279,46 @@ public class Repository {
 
         return Utils.readObject(commitFile, Commit.class);
     }
+
+    /**
+     * Retrieves the full commit ID given a partial commit ID.
+     * If the commit ID is abbreviated, this method searches the objects directory
+     * to find the full matching commit ID.
+     *
+     * @param partialCommitId The partial commit ID provided by the user.
+     * @return The full commit ID, or null if no match is found or there is ambiguity.
+     */
+    public CommitResult getFullCommitId(String partialCommitId) {
+        // Get a list of all commit files in the objects directory
+        File[] commits = OBJECTS_DIR.listFiles();
+
+        if (commits == null || commits.length == 0) {
+            return new CommitResult(null, "No commits found");
+        }
+
+        // List to store possible matches
+        List<String> matches = new ArrayList<>();
+
+        // Iterate through all commits and check if any commit ID starts with the partialCommitId
+        for (File commit : commits) {
+            String commitId = commit.getName();
+
+            // Check if commit ID starts with the partial ID provided by the user
+            if (commitId.startsWith(partialCommitId)) {
+                matches.add(commitId);
+            }
+        }
+
+        // If there's exactly one match, return the full commit ID
+        if (matches.size() == 1) {
+            return new CommitResult(matches.get(0), "success");
+        } else if (matches.size() > 1) {
+            return new CommitResult(null, "multiple matches found (ambiguity)");
+        } else {
+            return new CommitResult(null, "no matches found");
+        }
+    }
+
 
     /**
      * Serializes and saves a commit to the objects directory.
