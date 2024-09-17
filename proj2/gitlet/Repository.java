@@ -4,28 +4,14 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
+ *  @author Yu-Pang
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
-
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
@@ -39,11 +25,12 @@ public class Repository {
     public static final String DEFAULT_HEAD_POINTER = "refs/heads/" + DEFAULT_BRANCH_NAME;
     private StagingArea stagingArea;
 
-    /* TODO: fill in the rest of this class. */
     // create a .gitlet directory
     public void init() {
         if (GITLET_DIR.exists() && GITLET_DIR.isDirectory()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.out.println(
+                    "A Gitlet version-control system already exists in the current directory."
+            );
             System.exit(0);
         }
         // Create the directory structure for the Gitlet VCS
@@ -170,7 +157,7 @@ public class Repository {
         byte[] blobContents = Utils.readContents(blobFile);
 
         // Write the contents back to the working directory, overwriting any existing file
-        Utils.writeContents(new File(CWD,fileName), blobContents);
+        Utils.writeContents(new File(CWD, fileName), blobContents);
     }
 
     public void checkoutFileFromCommit(String commitId, String filename) {
@@ -212,7 +199,8 @@ public class Repository {
     }
 
     /**
-     * Prints the history of commits, starting from the current HEAD commit and traversing back to the first commit.
+     * Prints the history of commits,
+     * starting from the current HEAD commit and traversing back to the first commit.
      */
     public void log() {
         // Step 1: Get the latest commit from the current branch (HEAD)
@@ -343,9 +331,8 @@ public class Repository {
     public void removeStagingArea() {
         String pathToBeRemoved = STAGING_AREA_FILE.getAbsolutePath();
         boolean isRemoved = STAGING_AREA_FILE.delete();
-        if (isRemoved) {
+        if (!isRemoved) {
             // System.out.println("File removed: " + pathToBeRemoved);
-        } else {
             System.out.println("File is not removed: " + pathToBeRemoved);
         }
     }
