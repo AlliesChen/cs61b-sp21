@@ -52,9 +52,22 @@ Creates a new commit object that records the current state of the staging area, 
 - `checkout -- [filename]`    
   Restores the version of the file specified by `[filename]` from the latest commit in the current branch.
 - `checkout [commit id] -- [filename]`    
-  Restores the version of the file from the specified `[commit id]`.
+  Restores the version of the file from the specified `[commit id]`. The file from the commit is retrieved from the objects store and written to the working directory.
 - `checkout [branch name]`    
   Switches to the specified [branch name], updating the working directory to match the state of that branch.
+
+### log
+
+Usage: `log`
+
+Displays the commit history starting from the current HEAD commit, going back through its parents. Each commit is printed with its ID, timestamp, and message in reverse chronological order. The log displays:
+
+```bash
+===
+commit <commit-id>
+Date: <timestamp>
+<commit-message>
+```
 
 ## Classes and Data Structures
 
@@ -119,6 +132,14 @@ The staging area is serialized and stored in a file within the `.gitlet` directo
 - Locate Commit: Retrieve the commit object from `objects/` using the commit ID (or latest commit for the current branch).
 - Retrieve Blob ID: Get the blob ID for the specified file from the commit's file snapshot.
 - Restore File: Read the blob from `objects/` and write its contents to the working directory.
+
+### Log Traversal
+
+- **Retrieve HEAD Commit**: Start from the latest commit in the current branch.
+
+- **Print Commit Details**: For each commit, display its ID, timestamp, and message.
+
+- **Traverse Parent Commits**: Move through the commit history by following each commit's parent(s).
 
 ## Persistence
 
