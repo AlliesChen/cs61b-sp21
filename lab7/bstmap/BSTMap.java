@@ -18,6 +18,25 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K,V> {
     }
     private BSTNode root; // The root of the BSTMap
     private int size; // To keep track of the number of key-value pairs
+    /**
+     * Prints the keys of the BSTMap in order of increasing key.
+     */
+    public void printInOrder() {
+        printInOrder(root); // Call helper method to print from the root
+        System.out.println(); // New line after printing all keys
+    }
+    /**
+     * Helper method to perform in-order traversal and print keys.
+     * @param node the current node being visited
+     */
+    private void printInOrder(BSTNode node) {
+       if (node == null) {
+           return; // Base case: if the node is null, return
+       }
+       printInOrder(node.left);  // Recursively visit the left subtree
+       System.out.print(node.key + " "); // Print the current node's key
+       printInOrder(node.right); // Recursively visit the right subtree
+    }
     public void clear() {
         root = null;
         size = 0;
@@ -68,6 +87,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K,V> {
     public Iterator<K> iterator() {
         return new BSTMapIterator();
     }
+
     private boolean containsKey(BSTNode node, K key) {
         if (node == null) {
             return false;
