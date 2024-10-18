@@ -1,6 +1,7 @@
 package hashmap;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
@@ -28,11 +29,20 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /* Instance Variables */
     private Collection<Node>[] buckets;
     // You should probably define some more!
-
+    private static final int DEFAULT_INITIAL_SIZE = 16;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
+    private int size; // Number of key-value pairs
+    private int capacity; // Current capacity of the array
+    private double loadFactor;
+    private HashSet<K> keySet; // Set to store the keys
     /** Constructors */
-    public MyHashMap() { }
+    public MyHashMap() {
+        this(DEFAULT_INITIAL_SIZE, DEFAULT_LOAD_FACTOR);
+    }
 
-    public MyHashMap(int initialSize) { }
+    public MyHashMap(int initialSize) {
+        this(initialSize, DEFAULT_LOAD_FACTOR);
+    }
 
     /**
      * MyHashMap constructor that creates a backing array of initialSize.
@@ -41,7 +51,18 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialSize initial size of backing array
      * @param maxLoad maximum load factor
      */
-    public MyHashMap(int initialSize, double maxLoad) { }
+    public MyHashMap(int initialSize, double maxLoad) {
+        this.capacity = initialSize; // Set the initial capacity
+        this.loadFactor = maxLoad; // Set the load factor threshold
+        this.size = 0; // Initially, the map is empty
+        this.buckets = (Collection<Node>[]) new Collection[capacity]; // Create the array of collection
+        this.keySet = new HashSet<>(); // Initialize the set of keys
+
+        // Initialize each bucket using the createBucket factory method
+        for (int i = 0; i < capacity; i+= 1) {
+            buckets[i] = createBucket(); // User the factory method to create each bucket
+        }
+    }
 
     /**
      * Returns a new node to be placed in a hash table bucket
